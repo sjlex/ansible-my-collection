@@ -1,1 +1,1 @@
-# ansible-my-collections
+# ansible-my-collection

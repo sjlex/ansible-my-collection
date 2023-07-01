@@ -1,0 +1,134 @@
+ARG DOCKER_IMAGE=python:3.11.4-bullseye
+ARG OS_VERSION_CODENAME=bullseye
+ARG POETRY_VERSION=1.5.1
+
+# -----------------------------------------------------------------------------
+# BASE
+# ------------------------------------------------------------------------------
+FROM $DOCKER_IMAGE as base
+
+# Install packages
+RUN apt-get update -qq \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends \
+        sudo \
+        rsync \
+        ca-certificates \
+        systemd \
+        systemd-sysv \
+        dbus \
+        dbus-user-session \
+    && apt-get clean \
+    && rm -rf /var/cache/apt/archives/* \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+    && truncate -s 0 /var/log/*log
+
+# ------------------------------------------------------------------------------
+# RUNTIME-ENV
+# ------------------------------------------------------------------------------
+FROM base as runtime-env
+
+ARG OS_VERSION_CODENAME
+ARG POETRY_VERSION
+
+# Docker repo
+RUN install -m 0755 -d /etc/apt/keyrings
+RUN curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+RUN chmod a+r /etc/apt/keyrings/docker.gpg
+RUN echo \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg]  \
+    https://download.docker.com/linux/debian \
+    $OS_VERSION_CODENAME stable" | \
+    tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# Vagrant repo
+RUN curl -fsSL https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /etc/apt/keyrings/hashicorp.gpg
+RUN chmod a+r /etc/apt/keyrings/hashicorp.gpg
+RUN echo \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/hashicorp.gpg]  \
+    https://apt.releases.hashicorp.com \
+    $OS_VERSION_CODENAME main" | \
+    tee /etc/apt/sources.list.d/hashicorp.list > /dev/null
+
+# Install packages
+RUN apt-get update -qq \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -yq --no-install-recommends \
+        docker-ce-cli \
+        vagrant \
+        virt-manager \
+        virtinst \
+        qemu \
+        qemu-kvm \
+        qemu-system \
+        bridge-utils \
+        dnsmasq-base \
+        ebtables \
+        nfs-common \
+        nfs-kernel-server \
+        libosinfo-bin \
+        libguestfs-tools \
+        libvirt-clients \
+        libvirt-daemon \
+        libvirt-daemon-system \
+        libvirt-dev \
+        libxml2-dev \
+        libxslt-dev \
+        ruby-dev \
+        ruby-libvirt \
+        ruby-fog-libvirt \
+        zlib1g-dev \
+    && apt-get clean \
+    && rm -rf /var/cache/apt/archives/* \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+    && truncate -s 0 /var/log/*log
+
+# Vagrant configuration
+RUN vagrant plugin install vagrant-libvirt
+
+# Libvirt configuration
+RUN sed -i '/unix_sock_group/c\unix_sock_group = "libvirt"' /etc/libvirt/libvirtd.conf
+
+# Install poetry
+RUN pip install --upgrade pip && \
+    pip install "poetry==$POETRY_VERSION" && \
+    rm -rf /root/.cache
+
+# Install taskfile
+RUN sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/bin
+
+# ------------------------------------------------------------------------------
+# PROJECT-ENV
+# ------------------------------------------------------------------------------
+FROM runtime-env as project-env
+
+WORKDIR /usr/src
+
+# Install poetry packages \
+COPY ./poetry.lock* /usr/src
+COPY ./pyproject.toml /usr/src
+RUN poetry install \
+    --no-root \
+    --no-interaction \
+    --no-directory
+
+# Install ansible-galaxy collections
+RUN poetry run \
+    ansible-galaxy collection install \
+    "community.docker:>=3.0.2" \
+    "ansible.posix:>=1.4.0"
+
+# ------------------------------------------------------------------------------
+# RUNTIME
+# ------------------------------------------------------------------------------
+FROM project-env as runtime
+MAINTAINER Sergei Aleksandrov <sergei.a.aleks@gmail.com>
+
+# Autologin service
+COPY ./scripts/autologin.conf /etc/systemd/system/console-getty.service.d/
+RUN chmod 0644 /etc/systemd/system/console-getty.service.d/autologin.conf
+
+# Entrypoint
+COPY ./scripts/docker-entrypoint.sh /
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
+
+CMD ["/sbin/init"]

@@ -1,0 +1,27 @@
+namespace: sjlex
+name: collection
+version: 0.1.0
+description: My Ansible collection
+
+authors:
+  - Sergei Aleksandrov <sergei.a.aleks@gmail.com>
+license:
+  - MIT
+license_file: LICENSE
+readme: README.md
+tags:
+  - ansible
+  - collection
+  - roles
+  - molecule
+  - linux
+  - debian
+
+repository: https://github.com/sjlex/ansible-my-collection
+documentation: https://github.com/sjlex/ansible-my-collection/blob/main/README.md
+homepage: https://github.com/sjlex/ansible-my-collection
+issues: https://github.com/sjlex/ansible-my-collection/issues
+
+build_ignore: []
+
+dependencies: {}
