@@ -1,0 +1,7 @@
+---
+# vars file for fish
+
+__fish_package_name: "fish"
+__fish_packages:
+  - "{{ __fish_package_name }}={{ fish_package_version }}"
+__fish_dependencies: []

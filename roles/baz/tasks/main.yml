@@ -1,4 +1,0 @@
----
-- name: "Baz: Hello world"
-  ansible.builtin.debug:
-    msg: "Baz: Hello world"

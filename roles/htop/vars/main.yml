@@ -1,0 +1,7 @@
+---
+# vars file for htop
+
+__htop_package_name: "htop"
+__htop_packages:
+  - "{{ __htop_package_name }}"
+__htop_dependencies: []

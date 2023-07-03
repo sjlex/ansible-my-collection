@@ -1,0 +1,3 @@
+{% if docker_host_tcp and docker_host_url != '' %}
+export DOCKER_HOST={{ docker_host_url }}
+{% endif %}

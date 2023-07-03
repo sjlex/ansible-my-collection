@@ -1,7 +1,7 @@
 version: '3'
 
 vars:
-  VERSION: '0.1.0'
+  VERSION: '1.0.0'
   DOCKER_IMAGE: 'ansible-my-collection:{{.VERSION}}'
 
 env:
@@ -23,21 +23,35 @@ tasks:
   # ----------------------------------------------------------------------------
 
   "install":
-    desc: "Install all dependencies"
+    desc: "Install dependencies"
     cmds:
       - task: "dependencies:install"
 
   "dependencies:install":
+    desc: "Install dependencies"
+    cmds:
+      - task: "dependencies:poetry:install-main"
+      - task: "dependencies:ansible-galaxy:install"
+
+  "dependencies:dev:install":
     desc: "Install all dependencies"
     cmds:
       - task: "dependencies:poetry:install"
       - task: "dependencies:ansible-galaxy:install"
 
   "dependencies:poetry:install":
-    desc: "Install dependencies (poetry)"
+    desc: "Install dependencies (poetry: main + dev)"
     cmds:
       - poetry install
         --no-root
+        --no-interaction
+        {{.CLI_ARGS}}
+
+  "dependencies:poetry:install-main":
+    desc: "Install dependencies (poetry: only main)"
+    cmds:
+      - poetry install
+        --only main
         --no-interaction
         {{.CLI_ARGS}}
 
@@ -130,15 +144,18 @@ tasks:
       - task: "test:role:all"
 
   "test:role:all":
-    desc: "Test all roles"
+    desc: "Test all roles and scenarios"
     cmds:
       - cmd: |
+          rc=0
           for molecule_dir in roles/*/molecule; do
           (
-            cd $(dirname $molecule_dir)
+            cd $(dirname $molecule_dir) &&
             poetry run \
-            molecule test
-          )
+            molecule test --all
+          ) || rc=$?
+
+          if [ $rc -ne 0 ]; then break; exit $rc; fi
           done
 
   "test:role":
@@ -159,7 +176,7 @@ tasks:
       - cmd: |
           cd {{.ROLE_DIR}}
           poetry run \
-          molecule test
+          molecule test --all
 
   # ----------------------------------------------------------------------------
   # Lint
@@ -223,6 +240,7 @@ tasks:
         black
           --check
           --diff
+          --line-length=120
           {{.ROOT_DIR}}
           {{.CLI_ARGS}}
 
@@ -231,5 +249,6 @@ tasks:
     cmds:
       - poetry run
         black
+          --line-length=120
           {{.ROOT_DIR}}
           {{.CLI_ARGS}}

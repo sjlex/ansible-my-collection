@@ -1,0 +1,31 @@
+---
+- name: "Set up the repository"
+  become: true
+  become_user: root
+  block:
+    - name: "Get apt signing key"
+      ansible.builtin.apt_key:
+        id: "{{ fish_key_id }}"
+        url: "{{ fish_key_url }}"
+        keyring: "{{ fish_key_path }}"
+        state: present
+
+    - name: "Add apt source"
+      ansible.builtin.apt_repository:
+        filename: "shells:fish:release:3.list"
+        state: present
+        mode: 0755
+        repo: >
+          deb [arch=amd64 signed-by={{ fish_key_path }}]
+          {{ fish_repo_url }}
+          /
+
+- name: "Install fish"
+  become: true
+  become_user: root
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  loop: "{{ __fish_packages }}"

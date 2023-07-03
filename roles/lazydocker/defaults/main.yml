@@ -1,0 +1,5 @@
+---
+# defaults file for lazydocker
+
+lazydocker_package_version: "0.20.0"
+lazydocker_package_url: "https://github.com/jesseduffield/lazydocker/releases/download/v{{ lazydocker_package_version }}/lazydocker_{{ lazydocker_package_version }}_Linux_arm64.tar.gz"

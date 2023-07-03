@@ -1,0 +1,7 @@
+---
+# vars file for tmux
+
+__tmux_package_name: "tmux"
+__tmux_packages:
+  - "{{ __tmux_package_name }}"
+__tmux_dependencies: []

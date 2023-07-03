@@ -1,7 +1,7 @@
 namespace: sjlex
 name: collection
-version: 0.1.0
-description: My Ansible collection
+version: 1.0.0
+description: An Ansible Collection of roles.
 
 authors:
   - Sergei Aleksandrov <sergei.a.aleks@gmail.com>
@@ -24,4 +24,5 @@ issues: https://github.com/sjlex/ansible-my-collection/issues
 
 build_ignore: []
 
-dependencies: {}
+dependencies:
+  community.general: ">=7.1.0"

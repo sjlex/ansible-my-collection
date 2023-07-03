@@ -1,0 +1,12 @@
+---
+- name: "Converge"
+  hosts: all
+  remote_user: "ansible"
+
+  tasks:
+    - name: "Include docker"
+      ansible.builtin.include_role:
+        name: "docker"
+      vars:
+        docker_host_tcp: true
+        docker_host_url: "tcp://localhost:2375"

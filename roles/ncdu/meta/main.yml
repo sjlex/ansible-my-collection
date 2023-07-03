@@ -1,0 +1,19 @@
+galaxy_info:
+  role_name: ncdu
+  author: sjlex
+  description: An Ansible role to install and configure ncdu.
+  license: MIT
+
+  min_ansible_version: "2.1"
+
+  platforms:
+    - name: Debian
+      versions:
+      - bookworm
+      - bullseye
+      - buster
+
+  galaxy_tags:
+    - ncdu
+
+dependencies: []

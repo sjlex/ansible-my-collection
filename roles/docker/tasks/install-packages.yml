@@ -1,0 +1,42 @@
+---
+- name: "Set up the repository"
+  become: true
+  become_user: root
+  block:
+    - name: "Get apt signing key"
+      ansible.builtin.apt_key:
+        id: "{{ docker_key_id }}"
+        url: "{{ docker_key_url }}"
+        keyring: "{{ docker_key_path }}"
+        state: present
+
+    - name: "Add apt source"
+      ansible.builtin.apt_repository:
+        filename: "docker"
+        state: present
+        mode: 0755
+        repo: >
+          deb [arch=amd64 signed-by={{ docker_key_path }}]
+          {{ docker_repo_url }}
+          {{ ansible_distribution_release }}
+          stable
+
+- name: "Install docker"
+  become: true
+  become_user: root
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  loop: "{{ __docker_packages }}"
+
+- name: "Install dependencies"
+  become: true
+  become_user: root
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  loop: "{{ __docker_dependencies }}"

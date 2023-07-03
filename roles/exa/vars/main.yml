@@ -1,0 +1,7 @@
+---
+# vars file for exa
+
+__exa_package_name: "exa"
+__exa_packages:
+  - "{{ __exa_package_name }}"
+__exa_dependencies: []

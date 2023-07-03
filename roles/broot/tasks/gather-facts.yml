@@ -1,0 +1,13 @@
+---
+- name: "Get __broot_is_installed"
+  block:
+    - name: "Check if broot is installed"
+      ansible.builtin.shell: |
+        which broot
+      register: __broot_is_installed
+      failed_when: false
+      changed_when: "__broot_is_installed.rc >= 1"
+
+    - name: "Set facts"
+      ansible.builtin.set_fact:
+        __broot_is_installed: "{{ not __broot_is_installed.rc }}"

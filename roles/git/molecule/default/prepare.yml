@@ -1,0 +1,41 @@
+---
+- name: "Prepare"
+  hosts: all
+  remote_user: "root"
+
+  tasks:
+    - name: "Remove packages"
+      ansible.builtin.apt:
+        name: "{{ item }}"
+        state: absent
+        purge: true
+        clean: true
+      loop:
+        - git
+
+    - name: "Install packages"
+      become: true
+      ansible.builtin.apt:
+        name: "{{ item }}"
+        update_cache: true
+        cache_valid_time: 3600
+      loop:
+        - sudo
+
+    - name: "Create a login user"
+      become: true
+      ansible.builtin.user:
+        name: "ansible"
+        uid: 1000
+        groups:
+          - sudo
+        shell: /bin/bash
+        state: present
+
+    - name: "Configuration sudo"
+      become: true
+      ansible.builtin.copy:
+        dest: "/etc/sudoers.d/ansible"
+        mode: 0440
+        content: |
+          ansible ALL=(ALL) NOPASSWD: ALL

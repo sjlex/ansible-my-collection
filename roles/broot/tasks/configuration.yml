@@ -1,0 +1,18 @@
+---
+- name: "Check if config file exists"
+  ansible.builtin.stat:
+    path: '{{ ansible_env["HOME"] }}/.config/broot/conf.hjson'
+  register: __broot_config_file_rg
+
+- name: "Write default conf files"
+  when: not __broot_config_file_rg.stat.exists
+  ansible.builtin.shell: |
+    broot --write-default-conf '{{ ansible_env["HOME"] }}/.config/broot'
+  register: __broot_write_default_config_rg
+  changed_when: __broot_write_default_config_rg.rc != 0
+
+- name: "Copy conf.hjson"
+  ansible.builtin.template:
+    src: conf.hjson.j2
+    dest: '{{ ansible_env["HOME"] }}/.config/broot/conf.hjson'
+    mode: 0644

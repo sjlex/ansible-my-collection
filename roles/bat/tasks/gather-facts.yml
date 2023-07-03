@@ -1,0 +1,13 @@
+---
+- name: "Get __bat_is_installed"
+  block:
+    - name: "Gather the package facts"
+      ansible.builtin.package_facts:
+        manager: auto
+
+    - name: "Set facts"
+      ansible.builtin.set_fact:
+        __bat_is_installed: '{{
+          __bat_package_name in ansible_facts.packages and
+          ansible_facts.packages[__bat_package_name][0].version == bat_package_version
+        }}'

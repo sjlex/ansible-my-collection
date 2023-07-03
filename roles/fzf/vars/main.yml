@@ -1,0 +1,7 @@
+---
+# vars file for fzf
+
+__fzf_package_name: "fzf"
+__fzf_packages:
+  - "{{ __fzf_package_name }}"
+__fzf_dependencies: []

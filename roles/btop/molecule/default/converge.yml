@@ -1,0 +1,9 @@
+---
+- name: "Converge"
+  hosts: all
+  remote_user: "ansible"
+
+  tasks:
+    - name: "Include btop"
+      ansible.builtin.include_role:
+        name: "btop"

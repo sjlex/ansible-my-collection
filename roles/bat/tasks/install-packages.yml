@@ -1,0 +1,27 @@
+---
+- name: "Install bat"
+  when: not __bat_is_installed
+  block:
+    - name: "Install from deb"
+      block:
+        - name: "Download deb package"
+          become: true
+          become_user: root
+          ansible.builtin.get_url:
+            url: "{{ bat_package_url }}"
+            dest: "/tmp/{{ __bat_deb_filename }}"
+            mode: 0777
+
+        - name: "Install deb package"
+          become: true
+          become_user: root
+          ansible.builtin.apt:
+            deb: "/tmp/{{ __bat_deb_filename }}"
+
+      always:
+        - name: "Remove tmp files"
+          become: true
+          become_user: root
+          ansible.builtin.file:
+            path: "/tmp/{{ __bat_deb_filename }}"
+            state: absent

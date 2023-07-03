@@ -6,3 +6,5 @@ select = [
   "C",  # flake8-comprehensions
   "B",  # flake8-bugbear
 ]
+
+line-length = 120

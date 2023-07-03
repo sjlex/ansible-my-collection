@@ -1,0 +1,15 @@
+---
+# defaults file for fish
+
+fish_key_id: "2CE2AC08D880C8E4"
+fish_key_url: "https://download.opensuse.org/repositories/shells:fish:release:3/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}/Release.key"
+fish_key_path: "/usr/share/keyrings/fish.gpg"
+
+fish_package_version: "3.6.1-1"
+fish_repo_url: "https://download.opensuse.org/repositories/shells:/fish:/release:/3/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}/"
+
+fisher: true
+fisher_package_name: "jorgebucaran/fisher"
+fisher_url: "https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish"
+fisher_install_plugins: true
+fisher_plugins: []

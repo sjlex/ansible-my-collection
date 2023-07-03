@@ -1,0 +1,31 @@
+---
+- name: "Get __htop_installed_version"
+  block:
+    - name: "Gather the package facts"
+      ansible.builtin.package_facts:
+        manager: auto
+
+    - name: "Get htop version"
+      ansible.builtin.set_fact:
+        __htop_installed_version: '{{ ansible_facts.packages[__htop_package_name][0].version }}'
+
+- name: "Copy htoprc (htop 3.2.*)"
+  ansible.builtin.copy:
+    src: 3.2/htoprc
+    dest: '{{ ansible_env["HOME"] }}/.config/htop/'
+    mode: 0644
+  when: __htop_installed_version.startswith("3.2")
+
+- name: "Copy htoprc (htop 3.0.*)"
+  ansible.builtin.copy:
+    src: 3.0/htoprc
+    dest: '{{ ansible_env["HOME"] }}/.config/htop/'
+    mode: 0644
+  when: __htop_installed_version.startswith("3.0")
+
+- name: "Copy htoprc (htop 2.2.*)"
+  ansible.builtin.copy:
+    src: 2.2/htoprc
+    dest: '{{ ansible_env["HOME"] }}/.config/htop/'
+    mode: 0644
+  when: __htop_installed_version.startswith("2.2")

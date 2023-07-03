@@ -1,0 +1,13 @@
+---
+- name: "Get __lazydocker_is_installed"
+  block:
+    - name: "Check if lazydocker is installed"
+      ansible.builtin.shell: |
+        which lazydocker
+      register: __lazydocker_is_installed
+      failed_when: false
+      changed_when: "__lazydocker_is_installed.rc >= 1"
+
+    - name: "Set facts"
+      ansible.builtin.set_fact:
+        __lazydocker_is_installed: "{{ not __lazydocker_is_installed.rc }}"

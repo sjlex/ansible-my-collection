@@ -1,0 +1,7 @@
+---
+# vars file for lazydocker
+
+__lazydocker_package_name: "lazydocker"
+__lazydocker_packages:
+  - "{{ __lazydocker_package_name }}"
+__lazydocker_dependencies: []

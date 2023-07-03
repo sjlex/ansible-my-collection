@@ -1,0 +1,16 @@
+[core]
+  excludesfile = {{ ansible_env["HOME"] }}/.gitignore
+{% if git_core_autocrlf != '' %}
+  autocrlf = {{ git_core_autocrlf }}
+{% endif %}
+{% if git_core_filemode != '' %}
+  filemode = {{ git_core_filemode }}
+{% endif %}
+
+[user]
+{% if git_user_name != '' %}
+  name = {{ git_user_name }}
+{% endif %}
+{% if git_user_email != '' %}
+  email = {{ git_user_email }}
+{% endif %}

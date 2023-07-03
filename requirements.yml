@@ -2,4 +2,6 @@
 
 roles: []
 
-collections: []
+collections:
+  - name: community.general
+    version: ">=7.1.0"
