@@ -1,0 +1,5 @@
+---
+# defaults file for broot
+
+broot_package_version: "1.24.1"
+broot_package_url: "https://github.com/Canop/broot/releases/download/v{{ broot_package_version }}/broot_{{ broot_package_version }}.zip"

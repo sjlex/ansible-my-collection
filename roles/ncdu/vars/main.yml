@@ -1,0 +1,7 @@
+---
+# vars file for ncdu
+
+__ncdu_package_name: "ncdu"
+__ncdu_packages:
+  - "{{ __ncdu_package_name }}"
+__ncdu_dependencies: []

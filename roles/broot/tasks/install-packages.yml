@@ -1,0 +1,72 @@
+---
+- name: "Install broot"
+  when: not __broot_is_installed
+  block:
+    - name: "Install from git"
+      block:
+        - name: "Create tmp dir"
+          become: true
+          become_user: root
+          ansible.builtin.file:
+            path: "/tmp/broot"
+            state: directory
+            mode: 0777
+
+        - name: "Download and extract archive"
+          become: true
+          become_user: root
+          ansible.builtin.unarchive:
+            src: "{{ broot_package_url }}"
+            dest: "/tmp/broot"
+            remote_src: true
+            mode: 0777
+
+        - name: "Copy broot"
+          block:
+            - name: "Copy broot"
+              become: true
+              become_user: root
+              when:
+                - ansible_facts['distribution'] == 'Debian'
+                - not ansible_facts['distribution_major_version'] == '10'
+              ansible.builtin.copy:
+                src: "/tmp/broot/x86_64-linux/broot"
+                dest: "/usr/local/bin"
+                remote_src: true
+                mode: 0755
+
+            - name: "Copy broot (older GLIBC)"
+              become: true
+              become_user: root
+              when:
+                - ansible_facts['distribution'] == 'Debian'
+                - ansible_facts['distribution_major_version'] == '10'
+              ansible.builtin.copy:
+                src: "/tmp/broot/x86_64-unknown-linux-gnu/broot"
+                dest: "/usr/local/bin"
+                remote_src: true
+                mode: 0755
+
+        - name: "Skip shell function installation"
+          block:
+            - name: "Skip shell function installation (root)"
+              become: true
+              become_user: root
+              ansible.builtin.shell: |
+                broot --set-install-state refused
+              register: __broot_skip_shell_rg
+              changed_when: __broot_skip_shell_rg.rc != 0
+
+            - name: "Skip shell function installation (user)"
+              ansible.builtin.shell: |
+                broot --set-install-state refused
+              register: __broot_skip_shell_rg
+              changed_when: __broot_skip_shell_rg.rc != 0
+
+      always:
+        - name: "Remove tmp files"
+          become: true
+          become_user: root
+          ansible.builtin.file:
+            path: "/tmp/broot"
+            state: absent

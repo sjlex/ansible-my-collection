@@ -1,0 +1,17 @@
+---
+- name: "Role: bat"
+  tags:
+    - bat
+  when:
+    - ansible_facts['distribution'] == 'Debian'
+    - ansible_facts['distribution_major_version'] == "12" or
+      ansible_facts['distribution_major_version'] == "11" or
+      ansible_facts['distribution_major_version'] == "10"
+  block:
+    - name: "Gather facts"
+      ansible.builtin.include_tasks:
+        file: gather-facts.yml
+
+    - name: "Install packages"
+      ansible.builtin.include_tasks:
+        file: install-packages.yml

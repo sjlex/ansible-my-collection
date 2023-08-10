@@ -1,0 +1,7 @@
+---
+# vars file for mc
+
+__mc_package_name: "mc"
+__mc_packages:
+  - "{{ __mc_package_name }}"
+__mc_dependencies: []

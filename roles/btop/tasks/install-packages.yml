@@ -1,0 +1,47 @@
+---
+- name: "Install btop"
+  when: not __btop_is_installed
+  block:
+    - name: "Install make"
+      become: true
+      become_user: root
+      ansible.builtin.apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+      loop:
+        - make
+
+    - name: "Install from git"
+      block:
+        - name: "Download and extract package"
+          become: true
+          become_user: root
+          ansible.builtin.unarchive:
+            src: "{{ btop_package_url }}"
+            dest: "/tmp/"
+            remote_src: true
+            mode: 0777
+
+        - name: "Install btop"
+          become: true
+          become_user: root
+          community.general.make:
+            chdir: "/tmp/btop"
+            target: install
+
+        - name: "Make btop always run as root"
+          become: true
+          become_user: root
+          community.general.make:
+            chdir: "/tmp/btop"
+            target: setuid
+
+      always:
+        - name: "Remove tmp files"
+          become: true
+          become_user: root
+          ansible.builtin.file:
+            path: "/tmp/btop"
+            state: absent

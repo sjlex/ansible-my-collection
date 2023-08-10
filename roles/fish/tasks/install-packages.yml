@@ -1,0 +1,14 @@
+---
+- name: "Install fish"
+  ansible.builtin.include_tasks:
+    file: install-fish.yml
+
+- name: "Install fisher"
+  when: fisher
+  ansible.builtin.include_tasks:
+    file: install-fisher.yml
+
+- name: "Install fish plugins"
+  when: fisher and fisher_install_plugins
+  ansible.builtin.include_tasks:
+    file: install-fish-plugins.yml

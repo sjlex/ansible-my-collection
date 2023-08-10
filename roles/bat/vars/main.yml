@@ -1,0 +1,9 @@
+---
+# vars file for bat
+
+__bat_package_name: "bat"
+__bat_packages:
+  - "{{ __bat_package_name }}"
+__bat_dependencies: []
+
+__bat_deb_filename: "{{ __bat_package_name }}_{{ bat_package_version }}_amd64.deb"

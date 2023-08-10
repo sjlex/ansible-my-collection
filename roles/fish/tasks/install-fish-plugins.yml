@@ -1,0 +1,45 @@
+---
+- name: "Gather facts"
+  block:
+    - name: "Get __fisher_is_installed"
+      block:
+        - name: "Check if fisher is installed"
+          ansible.builtin.shell: |
+            fisher --version
+          args:
+            executable: "/usr/bin/fish"
+          register: __fisher_is_installed
+          failed_when: false
+          changed_when: "__fisher_is_installed.rc >= 1"
+
+        - name: "Set facts"
+          ansible.builtin.set_fact:
+            __fisher_is_installed: "{{ not __fisher_is_installed.rc }}"
+
+- name: "Install plugins"
+  when: __fisher_is_installed
+  block:
+    - name: "Gather facts"
+      block:
+        - name: "Get installed plugins (user mode)"
+          ansible.builtin.shell: |
+            fisher list
+          args:
+            executable: "/usr/bin/fish"
+          register: __fisher_installed_plugins
+          failed_when: false
+          changed_when: "__fisher_installed_plugins.rc >= 1"
+
+        - name: "Set facts"
+          ansible.builtin.set_fact:
+            __fisher_installed_plugins: "{{ __fisher_installed_plugins.stdout }}"
+
+    - name: "Install plugins"
+      when: not item in __fisher_installed_plugins
+      ansible.builtin.shell: |
+        fisher install {{ item }}
+      args:
+        executable: "/usr/bin/fish"
+      register: __fish_plugins_install_rg
+      changed_when: __fish_plugins_install_rg.rc != 0
+      loop: "{{ fisher_plugins }}"

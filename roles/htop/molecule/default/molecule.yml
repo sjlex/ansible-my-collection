@@ -1,0 +1,28 @@
+---
+dependency:
+  name: galaxy
+
+driver:
+  name: docker
+
+platforms:
+  # Debian 12 - Bookworm
+  - name: role-htop_debian12_${MOLECULE_INSTANCE_ID}
+    image: "python:3.11.4-bookworm"
+    pre_build_image: true
+
+  # Debian 11 - Bullseye
+  - name: role-htop_debian11_${MOLECULE_INSTANCE_ID}
+    image: "python:3.11.4-bullseye"
+    pre_build_image: true
+
+  # Debian 10 - Buster
+  - name: role-htop_debian10_${MOLECULE_INSTANCE_ID}
+    image: "python:3.11.4-buster"
+    pre_build_image: true
+
+provisioner:
+  name: ansible
+
+verifier:
+  name: testinfra

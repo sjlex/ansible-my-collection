@@ -1,0 +1,254 @@
+version: '3'
+
+vars:
+  VERSION: '1.0.0'
+  DOCKER_IMAGE: 'ansible-my-collection:{{.VERSION}}'
+
+env:
+  MOLECULE_INSTANCE_ID:
+    sh: base64 < /dev/urandom | tr -d 'O0Il1+/' | head -c 6; printf '\n'
+
+tasks:
+
+  # ----------------------------------------------------------------------------
+  # Default
+  # ----------------------------------------------------------------------------
+  default:
+    desc: "Show all tasks"
+    cmds:
+      - ./bin/task --list-all
+
+  # ----------------------------------------------------------------------------
+  # Dependencies
+  # ----------------------------------------------------------------------------
+
+  "install":
+    desc: "Install dependencies"
+    cmds:
+      - task: "dependencies:install"
+
+  "dependencies:install":
+    desc: "Install dependencies"
+    cmds:
+      - task: "dependencies:poetry:install-main"
+      - task: "dependencies:ansible-galaxy:install"
+
+  "dependencies:dev:install":
+    desc: "Install all dependencies"
+    cmds:
+      - task: "dependencies:poetry:install"
+      - task: "dependencies:ansible-galaxy:install"
+
+  "dependencies:poetry:install":
+    desc: "Install dependencies (poetry: main + dev)"
+    cmds:
+      - poetry install
+        --no-root
+        --no-interaction
+        {{.CLI_ARGS}}
+
+  "dependencies:poetry:install-main":
+    desc: "Install dependencies (poetry: only main)"
+    cmds:
+      - poetry install
+        --only main
+        --no-interaction
+        {{.CLI_ARGS}}
+
+  "dependencies:ansible-galaxy:install":
+    desc: "Install dependencies (ansible-galaxy)"
+    cmds:
+      - poetry run
+        ansible-galaxy install
+          -r requirements.yml
+          {{.CLI_ARGS}}
+
+  # ----------------------------------------------------------------------------
+  # Ansible
+  # ----------------------------------------------------------------------------
+
+  "run":
+    desc: "Run an Ansible role locally"
+    cmds:
+      - task: "run:local"
+
+  "run:local":
+    desc: "Run an Ansible role locally"
+    vars:
+      ROLE_NAME: "{{.CLI_ARGS}}"
+      ROLE_DIR:
+        sh: |
+          for tests_dir in roles/*/tests; do
+            if [ $(echo $tests_dir | grep -io "{{.ROLE_NAME}}") ]; then
+              echo $(dirname $tests_dir)
+            fi
+          done
+    preconditions:
+      - sh: '[ {{.ROLE_DIR}} ]'
+        msg: "Role not found"
+    cmds:
+      - poetry run
+        ansible-playbook
+          -vv
+          --connection=local
+          --inventory 127.0.0.1,
+          "{{.ROLE_DIR}}/tests/test.yml"
+
+  # ----------------------------------------------------------------------------
+  # Docker
+  # ----------------------------------------------------------------------------
+
+  "docker:run":
+    desc: "Run docker container"
+    cmds:
+      - task: "docker:container:run:shell"
+
+  "docker:build":
+    desc: "Build docker image"
+    cmds:
+      - task: "docker:image:build"
+
+  "docker:image:build":
+    desc: "Build docker image"
+    cmds:
+      - docker buildx build
+        -t {{.DOCKER_IMAGE}}
+        -f Dockerfile.dev
+        {{.ROOT_DIR}}
+        {{.CLI_ARGS}}
+
+  "docker:container:run:shell":
+    desc: "Run docker container"
+    cmds:
+      - docker run -it --rm
+        -v {{.ROOT_DIR}}:/usr/src
+        -v /var/run/docker.sock:/var/docker.sock
+        -v $HOME/.vagrant.d/boxes:/root/.vagrant.d/boxes
+        -w /usr/src
+        --privileged
+        {{.DOCKER_IMAGE}}
+        {{.CLI_ARGS}} || true
+
+  # ----------------------------------------------------------------------------
+  # Test
+  # ----------------------------------------------------------------------------
+
+  "test":
+    desc: "Run all tests"
+    cmds:
+      - task: "test:all"
+
+  "test:all":
+    desc: "Run all tests"
+    cmds:
+      - task: "test:role:all"
+
+  "test:role:all":
+    desc: "Test all roles and scenarios"
+    cmds:
+      - cmd: |
+          rc=0
+          for molecule_dir in roles/*/molecule; do
+          (
+            cd $(dirname $molecule_dir) &&
+            poetry run \
+            molecule test --all
+          ) || rc=$?
+
+          if [ $rc -ne 0 ]; then break; exit $rc; fi
+          done
+
+  "test:role":
+    desc: "Test a role"
+    vars:
+      ROLE_NAME: "{{.CLI_ARGS}}"
+      ROLE_DIR:
+        sh: |
+          for molecule_dir in roles/*/molecule; do
+            if [ $(echo $molecule_dir | grep -io "{{.ROLE_NAME}}") ]; then
+              echo $(dirname $molecule_dir)
+            fi
+          done
+    preconditions:
+      - sh: '[ {{.ROLE_DIR}} ]'
+        msg: "Role not found"
+    cmds:
+      - cmd: |
+          cd {{.ROLE_DIR}}
+          poetry run \
+          molecule test --all
+
+  # ----------------------------------------------------------------------------
+  # Lint
+  # ----------------------------------------------------------------------------
+
+  "lint":
+    desc: "Run linting"
+    deps:
+      - task: "lint:yamllint"
+      - task: "lint:ansible-lint"
+      - task: "lint:ruff"
+      - task: "lint:black"
+
+  "lint:fix":
+    desc: "Run linting and write to files"
+    cmds:
+      - task: "lint:ruff:fix"
+      - task: "lint:black:fix"
+
+  "lint:yamllint":
+    desc: "Linting (yamllint)"
+    cmds:
+      - poetry run
+        yamllint
+          --config-file .yamllint.yml
+          --strict
+          {{.ROOT_DIR}}
+          {{.CLI_ARGS}}
+
+  "lint:ansible-lint":
+    desc: "Linting (ansible-lint)"
+    cmds:
+      - poetry run
+        ansible-lint
+          --config-file .ansible-lint.yml
+          --exclude molecule.yml
+          {{.ROOT_DIR}}/*
+          {{.CLI_ARGS}}
+
+  "lint:ruff":
+    desc: "Linting (ruff)"
+    cmds:
+      - poetry run
+        ruff check
+          {{.ROOT_DIR}}
+          {{.CLI_ARGS}}
+
+  "lint:ruff:fix":
+    desc: "Reformat (ruff)"
+    cmds:
+      - poetry run
+        ruff
+          --fix
+          {{.ROOT_DIR}}
+          {{.CLI_ARGS}}
+
+  "lint:black":
+    desc: "Linting (black)"
+    cmds:
+      - poetry run
+        black
+          --check
+          --diff
+          --line-length=120
+          {{.ROOT_DIR}}
+          {{.CLI_ARGS}}
+
+  "lint:black:fix":
+    desc: "Reformat (black)"
+    cmds:
+      - poetry run
+        black
+          --line-length=120
+          {{.ROOT_DIR}}
+          {{.CLI_ARGS}}

@@ -1,0 +1,12 @@
+---
+- name: "Copy tmux config"
+  ansible.builtin.copy:
+    src: tmux
+    dest: '{{ ansible_env["HOME"] }}/.config/'
+    mode: 0644
+
+- name: "Create a symbolic link"
+  ansible.builtin.file:
+    src: '{{ ansible_env["HOME"] }}/.config/tmux/tmux.conf'
+    dest: '{{ ansible_env["HOME"] }}/.tmux.conf'
+    state: link

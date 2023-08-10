@@ -1,0 +1,13 @@
+---
+- name: "Role: mc"
+  tags:
+    - mc
+  when:
+    - ansible_facts['distribution'] == 'Debian'
+    - ansible_facts['distribution_major_version'] == "12" or
+      ansible_facts['distribution_major_version'] == "11" or
+      ansible_facts['distribution_major_version'] == "10"
+  block:
+    - name: "Install packages"
+      ansible.builtin.include_tasks:
+        file: install-packages.yml

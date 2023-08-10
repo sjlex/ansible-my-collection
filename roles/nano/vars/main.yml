@@ -1,0 +1,7 @@
+---
+# vars file for nano
+
+__nano_package_name: "nano"
+__nano_packages:
+  - "{{ __nano_package_name }}"
+__nano_dependencies: []

@@ -1,0 +1,39 @@
+---
+- name: "Install lazydocker"
+  when: not __lazydocker_is_installed
+  block:
+    - name: "Install from git"
+      block:
+        - name: "Create tmp dir"
+          become: true
+          become_user: root
+          ansible.builtin.file:
+            path: "/tmp/lazydocker"
+            state: directory
+            mode: 0777
+
+        - name: "Download and extract package"
+          become: true
+          become_user: root
+          ansible.builtin.unarchive:
+            src: "{{ lazydocker_package_url }}"
+            dest: "/tmp/lazydocker/"
+            remote_src: true
+            mode: 0777
+
+        - name: "Install lazydocker"
+          become: true
+          become_user: root
+          ansible.builtin.copy:
+            src: "/tmp/lazydocker/lazydocker"
+            dest: "/usr/local/bin"
+            remote_src: true
+            mode: 0755
+
+      always:
+        - name: "Remove tmp files"
+          become: true
+          become_user: root
+          ansible.builtin.file:
+            path: "/tmp/lazydocker"
+            state: absent

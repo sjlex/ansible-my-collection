@@ -1,0 +1,7 @@
+---
+# vars file for btop
+
+__btop_package_name: "btop"
+__btop_packages:
+  - "{{ __btop_package_name }}"
+__btop_dependencies: []

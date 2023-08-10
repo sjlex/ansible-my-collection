@@ -1,0 +1,5 @@
+---
+# defaults file for btop
+
+btop_package_version: "1.2.13"
+btop_package_url: "https://github.com/aristocratos/btop/releases/download/v{{ btop_package_version }}/btop-x86_64-linux-musl.tbz"

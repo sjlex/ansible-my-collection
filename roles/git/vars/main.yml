@@ -1,0 +1,7 @@
+---
+# vars file for git
+
+__git_package_name: "git"
+__git_packages:
+  - "{{ __git_package_name }}"
+__git_dependencies: []

@@ -1,0 +1,7 @@
+---
+# vars file for broot
+
+__broot_package_name: "broot"
+__broot_packages:
+  - "{{ __broot_package_name }}"
+__broot_dependencies: []

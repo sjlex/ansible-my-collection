@@ -1,0 +1,7 @@
+---
+# vars file for neovim
+
+__neovim_package_name: "neovim"
+__neovim_packages:
+  - "{{ __neovim_package_name }}"
+__neovim_dependencies: []

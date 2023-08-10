@@ -1,0 +1,7 @@
+---
+# vars file for tmuxinator
+
+__tmuxinator_package_name: "tmuxinator"
+__tmuxinator_packages:
+  - "{{ __tmuxinator_package_name }}"
+__tmuxinator_dependencies: []
