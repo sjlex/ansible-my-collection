@@ -1,5 +1,5 @@
 ---
 # defaults file for bat
 
-bat_package_version: "0.23.0"
+bat_package_version: "0.24.0"
 bat_package_url: "https://github.com/sharkdp/bat/releases/download/v{{ bat_package_version }}/bat_{{ bat_package_version }}_amd64.deb"
