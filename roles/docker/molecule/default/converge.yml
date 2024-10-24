@@ -7,3 +7,11 @@
     - name: "Include docker"
       ansible.builtin.include_role:
         name: "docker"
+
+    - name: "Add User to group"
+      become: true
+      become_user: root
+      ansible.builtin.user:
+        name: "ansible"
+        groups: "docker"
+        append: true

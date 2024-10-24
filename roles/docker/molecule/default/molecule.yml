@@ -8,14 +8,14 @@ driver:
 platforms:
   # Debian 12 - Bookworm
   - name: role-docker_debian12_${MOLECULE_INSTANCE_ID}
-    image: "python:3.11.4-bookworm"
+    image: "python:3.13.0-bookworm"
     pre_build_image: true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
   # Debian 11 - Bullseye
   - name: role-docker_debian11_${MOLECULE_INSTANCE_ID}
-    image: "python:3.11.4-bullseye"
+    image: "python:3.13.0-bullseye"
     pre_build_image: true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock

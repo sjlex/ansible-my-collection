@@ -10,3 +10,11 @@
       vars:
         docker_host_tcp: true
         docker_host_url: "tcp://localhost:2375"
+
+    - name: "Add User to group"
+      become: true
+      become_user: root
+      ansible.builtin.user:
+        name: "ansible"
+        groups: "docker"
+        append: true
