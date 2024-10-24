@@ -16,9 +16,9 @@ def test_smoke(host, user):
 @pytest.mark.parametrize(
     "os_name,os_codename,package_name,package_version",
     [
-        ("debian", "buster", "broot", "1.24.1"),
-        ("debian", "bullseye", "broot", "1.24.1"),
-        ("debian", "bookworm", "broot", "1.24.1"),
+        ("debian", "buster", "broot", "1.44.2"),
+        ("debian", "bullseye", "broot", "1.44.2"),
+        ("debian", "bookworm", "broot", "1.44.2"),
     ],
 )
 def test_package_is_installed(host, os_name, os_codename, package_name, package_version):

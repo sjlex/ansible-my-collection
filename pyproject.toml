@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "ansible-my-collection"
 description = "An Ansible Collection of roles."
-version = "1.0.0"
+version = "1.1.0"
 license = "MIT"
 
 authors = ["Sergei Aleksandrov <sergei.a.aleks@gmail.com>"]
@@ -21,17 +21,17 @@ repository = "https://github.com/sjlex/ansible-my-collection"
 documentation = "https://github.com/sjlex/ansible-my-collection/blob/main/README.md"
 
 [tool.poetry.dependencies]
-ansible = "8.0.0"
+python = "3.13.0"
+ansible = "^10.5.0"
 
 [tool.poetry.group.dev.dependencies]
-python = "3.11.4"
-molecule = "5.0.1"
-molecule-plugins = { version = "23.4.1", extras = ["docker", "vagrant"] }
-pytest-testinfra = "8.1.0"
-ansible-lint = { version = "6.16.2", markers = "platform_system != 'Windows'" }
-yamllint = "1.32.0"
-ruff = "0.0.274"
-black = "23.3.0"
+molecule = "^24.9.0"
+molecule-plugins = {extras = ["docker", "vagrant"], version = "^23.5.3"}
+pytest-testinfra = "^10.1.1"
+ansible-lint = { version = "^24.9.2", markers = "platform_system != 'Windows'" }
+yamllint = "^1.35.1"
+ruff = "^0.7.0"
+black = "^24.10.0"
 
 [build-system]
 requires = ["poetry-core"]

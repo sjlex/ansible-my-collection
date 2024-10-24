@@ -29,6 +29,7 @@
               when:
                 - ansible_facts['distribution'] == 'Debian'
                 - not ansible_facts['distribution_major_version'] == '10'
+                - not ansible_facts['distribution_major_version'] == '11'
               ansible.builtin.copy:
                 src: "/tmp/broot/x86_64-linux/broot"
                 dest: "/usr/local/bin"
@@ -40,7 +41,8 @@
               become_user: root
               when:
                 - ansible_facts['distribution'] == 'Debian'
-                - ansible_facts['distribution_major_version'] == '10'
+                - ansible_facts['distribution_major_version'] == '10' or
+                  ansible_facts['distribution_major_version'] == '11'
               ansible.builtin.copy:
                 src: "/tmp/broot/x86_64-unknown-linux-gnu/broot"
                 dest: "/usr/local/bin"
