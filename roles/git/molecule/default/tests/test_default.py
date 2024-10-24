@@ -54,6 +54,11 @@ def test_config(host, user, config_path):
     [
         ("ansible", "core.autocrlf"),
         ("ansible", "core.filemode"),
+        ("ansible", "user.name"),
+        ("ansible", "user.email"),
+        ("ansible", "user.signingkey"),
+        ("ansible", "commit.gpgsign"),
+        ("ansible", "tag.gpgsign"),
     ],
 )
 def test_git_get_config(host, user, config_param):
@@ -65,6 +70,21 @@ def test_git_get_config(host, user, config_param):
     )
 
     assert cmd.rc == 0
+
+    if config_param == "user.name":
+        assert cmd.stdout.startswith("Foo Bar")
+
+    if config_param == "user.email":
+        assert cmd.stdout.startswith("foo@bar.com")
+
+    if config_param == "user.signingkey":
+        assert cmd.stdout.startswith("1234")
+
+    if config_param == "commit.gpgsign":
+        assert cmd.stdout.startswith("true")
+
+    if config_param == "tag.gpgsign":
+        assert cmd.stdout.startswith("false")
 
     if config_param == "core.autocrlf":
         assert cmd.stdout.startswith("input")

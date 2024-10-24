@@ -3,5 +3,8 @@
 
 git_user_name: ""
 git_user_email: ""
+git_user_signingkey: ""
+git_commit_gpgsign: ""
+git_tag_gpgsign: ""
 git_core_autocrlf: "input"
 git_core_filemode: "false"
