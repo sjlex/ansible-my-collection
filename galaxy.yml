@@ -25,4 +25,4 @@ issues: https://github.com/sjlex/ansible-my-collection/issues
 build_ignore: []
 
 dependencies:
-  community.general: ">=7.1.0"
+  community.general: ">=9.5.0"

@@ -1,11 +1,12 @@
-ARG DOCKER_IMAGE=python:3.11.4-bullseye
-ARG OS_VERSION_CODENAME=bullseye
-ARG POETRY_VERSION=1.5.1
+ARG DOCKER_IMAGE=python:3.13.0-bookworm
+ARG OS_VERSION_CODENAME=bookworm
+ARG POETRY_VERSION=1.8.4
+ARG TASKFILE_VERSION=3.39.2
 
 # -----------------------------------------------------------------------------
 # BASE
 # ------------------------------------------------------------------------------
-FROM $DOCKER_IMAGE as base
+FROM $DOCKER_IMAGE AS base
 
 # Install packages
 RUN apt-get update -qq \
@@ -25,10 +26,11 @@ RUN apt-get update -qq \
 # ------------------------------------------------------------------------------
 # RUNTIME-ENV
 # ------------------------------------------------------------------------------
-FROM base as runtime-env
+FROM base AS runtime-env
 
 ARG OS_VERSION_CODENAME
 ARG POETRY_VERSION
+ARG TASKFILE_VERSION
 
 # Docker repo
 RUN install -m 0755 -d /etc/apt/keyrings
@@ -67,7 +69,6 @@ RUN apt-get update -qq \
         nfs-common \
         nfs-kernel-server \
         python3-apt \
-        qemu \
         qemu-kvm \
         qemu-system \
         ruby-dev \
@@ -94,12 +95,13 @@ RUN pip install --upgrade pip && \
     rm -rf /root/.cache
 
 # Install taskfile
-RUN sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/bin
+RUN sh -c "$(curl --location https://taskfile.dev/install.sh)" -- \
+  -b /usr/local/bin -d v$TASKFILE_VERSION
 
 # ------------------------------------------------------------------------------
 # PROJECT-ENV
 # ------------------------------------------------------------------------------
-FROM runtime-env as project-env
+FROM runtime-env AS project-env
 
 WORKDIR /usr/src
 
@@ -114,14 +116,13 @@ RUN poetry install \
 # Install ansible-galaxy collections
 RUN poetry run \
     ansible-galaxy collection install \
-    "community.docker:>=3.0.2" \
-    "ansible.posix:>=1.4.0"
+    "community.docker:>=4.0.0" \
+    "ansible.posix:>=1.6.1"
 
 # ------------------------------------------------------------------------------
 # RUNTIME
 # ------------------------------------------------------------------------------
-FROM project-env as runtime
-MAINTAINER Sergei Aleksandrov <sergei.a.aleks@gmail.com>
+FROM project-env AS runtime
 
 # Autologin service
 COPY ./scripts/autologin.conf /etc/systemd/system/console-getty.service.d/

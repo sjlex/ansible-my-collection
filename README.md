@@ -5,7 +5,7 @@
 ## Supported Operating Systems
 
 | Platform | Versions                   |
-|----------|----------------------------|
+| -------- | -------------------------- |
 | Debian   | Buster, Bullseye, Bookworm |
 
 ## Install
@@ -43,7 +43,7 @@ tasks:
 ## Development and testing
 
 ### 1. Build docker image and run dev-container:
-  
+
 ```shell
 ./bin/task docker:build
 ./bin/task docker:run
@@ -59,13 +59,13 @@ task dependencies:dev:install
 
 ```shell
 cd roles/fish
- ```
+```
 
 Run molecule test:
 
 ```shell
 molecule test
- ```
+```
 
 or
 
@@ -75,26 +75,26 @@ molecule converge &&
 molecule idempotence &&
 molecule verify &&
 molecule destroy
- ```
+```
 
 ### 4. Testing
 
 ```shell
 task test:all
- ```
+```
 
 or (specific role):
 
 ```shell
 task test:role -- fish
- ```
+```
 
 ### 5. Linting
 
 ```shell
-molecule lint
-molecule lint:fix
- ```
+task lint
+task lint:fix
+```
 
 ## License
 
