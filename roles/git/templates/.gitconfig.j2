@@ -14,3 +14,16 @@
 {% if git_user_email != '' %}
   email = {{ git_user_email }}
 {% endif %}
+{% if git_user_signingkey != '' %}
+  signingkey = {{ git_user_signingkey }}
+{% endif %}
+
+[commit]
+{% if git_commit_gpgsign != '' %}
+  gpgsign = {{ git_commit_gpgsign }}
+{% endif %}
+
+[tag]
+{% if git_tag_gpgsign != '' %}
+  gpgsign = {{ git_tag_gpgsign }}
+{% endif %}

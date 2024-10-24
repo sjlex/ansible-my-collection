@@ -15,6 +15,12 @@ Role Variables
 
 `git_user_email`: Email address
 
+`git_user_signingkey`: Signing key
+
+`git_commit_gpgsign`: Sign all commits
+
+`git_tag_gpgsign`: Sign all tags
+
 `git_core_autocrlf`: Autocrlf (default: input)
 
 `git_core_filemode`: Filemode (default: false)
