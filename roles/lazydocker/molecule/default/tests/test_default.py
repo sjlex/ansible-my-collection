@@ -16,9 +16,9 @@ def test_smoke(host, user):
 @pytest.mark.parametrize(
     "os_name,os_codename,package_name,package_version",
     [
-        ("debian", "buster", "lazydocker", "0.20.0"),
-        ("debian", "bullseye", "lazydocker", "0.20.0"),
-        ("debian", "bookworm", "lazydocker", "0.20.0"),
+        ("debian", "buster", "lazydocker", "0.23.3"),
+        ("debian", "bullseye", "lazydocker", "0.23.3"),
+        ("debian", "bookworm", "lazydocker", "0.23.3"),
     ],
 )
 def test_package_is_installed(host, os_name, os_codename, package_name, package_version):
